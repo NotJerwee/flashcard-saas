@@ -4,10 +4,11 @@ import React from 'react';
 import { Container, Box, Typography, AppBar, Toolbar, Button } from '@mui/material';
 import { SignUp } from '@clerk/nextjs';
 import Link from 'next/link';
+import { ClerkProvider } from '@clerk/nextjs';
 
 export default function SignUpPage() {
   return (
-	<>
+	<ClerkProvider>
 		<AppBar position="static" sx={{ backgroundColor: '#3f51b5' }}>
 			<Toolbar>
 			<Typography variant="h6" sx={{ flexGrow: 1 }}>
@@ -34,6 +35,6 @@ export default function SignUpPage() {
 			</Typography>
 			<SignUp />
 		</Box>
-	</>
+	</ClerkProvider>
   );
 }
