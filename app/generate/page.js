@@ -1,183 +1,190 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { useUser } from 'your-auth-library'
 import {
-  Container,
-  TextField,
-  Button,
-  Typography,
-  Box,
+	Container,
+	TextField,
+	Button,
+	Typography,
+	Box,
+	Grid,
+	Card,
+	CardActionArea,
+	CardContent,
+	Dialog,
+	DialogTitle,
+	DialogContent,
+	DialogContentText,
+	DialogActions
 } from '@mui/material'
-
-const [setName, setSetName] = useState('')
-const [dialogOpen, setDialogOpen] = useState(false)
-
-const handleOpenDialog = () => setDialogOpen(true)
-const handleCloseDialog = () => setDialogOpen(false)
-
-useEffect(() => {
-    async function getFlashcards() {
-        if (!user) return
-        const docRef = doc(collection(db, 'users'), user.id)
-        const docSnap = await getDoc(docRef)
-        if (docSnap.exists()) {
-            const collections = docSnap.data().flashcards || []
-            setFlashcards(collections)
-        } else {
-            await setDoc(docRef, { flashcards: [] })
-        }
-    }
-    getFlashcards()
-}, [user])
+import { db } from 'your-firebase-config'
+import { doc, getDoc, setDoc, writeBatch, collection } from 'firebase/firestore'
 
 export default function Generate() {
-    const { isLoaded, isSignedIn, user } = useUser()
-    const [text, setText] = useState('')
-    const [flashcards, setFlashcards] = useState([])
-    const router = useRouter()
+	const { isLoaded, isSignedIn, user } = useUser()
+	const [text, setText] = useState('')
+	const [flashcards, setFlashcards] = useState([])
+	const [setName, setSetName] = useState('')
+	const [dialogOpen, setDialogOpen] = useState(false)
+	const router = useRouter()
 
-    const handleCardClick = (id) => {
-        router.push(`/flashcard?id=${id}`)
-    }
+	const handleOpenDialog = () => setDialogOpen(true)
+	const handleCloseDialog = () => setDialogOpen(false)
 
-    const handleSubmit = async () => {
-        if (!text.trim()) {
-          alert('Please enter some text to generate flashcards.')
-          return
-        }
-      
-        try {
-            const response = await fetch('/api/generate', {
-                method: 'POST',
-                body: text,
-            })
-        
-            if (!response.ok) {
-                throw new Error('Failed to generate flashcards')
-            }
-      
-          const data = await response.json()
-          setFlashcards(data)
-        } catch (error) {
-          console.error('Error generating flashcards:', error)
-          alert('An error occurred while generating flashcards. Please try again.')
-        }
-    }
+	useEffect(() => {
+		async function getFlashcards() {
+			if (!user) return
+			const docRef = doc(collection(db, 'users'), user.id)
+			const docSnap = await getDoc(docRef)
+			if (docSnap.exists()) {
+				const collections = docSnap.data().flashcards || []
+				setFlashcards(collections)
+			} else {
+				await setDoc(docRef, { flashcards: [] })
+			}
+		}
+		getFlashcards()
+	}, [user])
 
-    const saveFlashcards = async () => {
-        if (!setName.trim()) {
-            alert('Please enter a name for your flashcard set.')
-            return
-        }
-      
-        try {
-            const userDocRef = doc(collection(db, 'users'), user.id)
-            const userDocSnap = await getDoc(userDocRef)
-        
-            const batch = writeBatch(db)
-        
-            if (userDocSnap.exists()) {
-                const userData = userDocSnap.data()
-                const updatedSets = [...(userData.flashcardSets || []), { name: setName }]
-                batch.update(userDocRef, { flashcardSets: updatedSets })
-            } else {
-                batch.set(userDocRef, { flashcardSets: [{ name: setName }] })
-            }
-        
-            const setDocRef = doc(collection(userDocRef, 'flashcardSets'), setName)
-            batch.set(setDocRef, { flashcards })
-        
-            await batch.commit()
-        
-            alert('Flashcards saved successfully!')
-            handleCloseDialog()
-            setSetName('')
-        } catch (error) {
-            console.error('Error saving flashcards:', error)
-            alert('An error occurred while saving flashcards. Please try again.')
-        }
-    }
+	const handleCardClick = (id) => {
+		router.push(`/flashcard?id=${id}`)
+	}
 
+	const handleSubmit = async () => {
+		if (!text.trim()) {
+			alert('Please enter some text to generate flashcards.')
+			return
+		}
 
-    return (
-        <Container maxWidth="md">
-        <Box sx={{ my: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-            Generate Flashcards
-            </Typography>
-            <TextField
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            label="Enter text"
-            fullWidth
-            multiline
-            rows={4}
-            variant="outlined"
-            sx={{ mb: 2 }}
-            />
-            <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-            fullWidth
-            >
-            Generate Flashcards
-            </Button>
-        </Box>
-        
-        {flashcards.length > 0 && (
-            <Box sx={{ mt: 4 }}>
-                <Typography variant="h5" component="h2" gutterBottom>
-                Generated Flashcards
-                </Typography>
-                <Grid container spacing={2}>
-                {flashcards.map((flashcard, index) => (
-                    <Grid item xs={12} sm={6} md={4} key={index}>
-                    <Card>
-                        <CardContent>
-                        <Typography variant="h6">Front:</Typography>
-                        <Typography>{flashcard.front}</Typography>
-                        <Typography variant="h6" sx={{ mt: 2 }}>Back:</Typography>
-                        <Typography>{flashcard.back}</Typography>
-                        </CardContent>
-                    </Card>
-                    </Grid>
-                ))}
-                </Grid>
+		try {
+			const response = await fetch('/api/generate', {
+				method: 'POST',
+				body: text,
+			})
 
-                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                    <Button variant="contained" color="primary" onClick={handleOpenDialog}>
-                    Save Flashcards
-                    </Button>
-                </Box>
+			if (!response.ok) {
+				throw new Error('Failed to generate flashcards')
+			}
 
-            </Box>
-            )}
+			const data = await response.json()
+			setFlashcards(data)
+		} catch (error) {
+			console.error('Error generating flashcards:', error)
+			alert('An error occurred while generating flashcards. Please try again.')
+		}
+	}
 
-            <Dialog open={dialogOpen} onClose={handleCloseDialog}>
-            <DialogTitle>Save Flashcard Set</DialogTitle>
-            <DialogContent>
-                <DialogContentText>
-                Please enter a name for your flashcard set.
-                </DialogContentText>
-                <TextField
-                autoFocus
-                margin="dense"
-                label="Set Name"
-                type="text"
-                fullWidth
-                value={setName}
-                onChange={(e) => setSetName(e.target.value)}
-                />
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleCloseDialog}>Cancel</Button>
-                <Button onClick={saveFlashcards} color="primary">
-                Save
-                </Button>
-            </DialogActions>
-            </Dialog>
+	const saveFlashcards = async () => {
+		if (!setName.trim()) {
+			alert('Please enter a name for your flashcard set.')
+			return
+		}
 
-        </Container>
-    )
+		try {
+			const userDocRef = doc(collection(db, 'users'), user.id)
+			const userDocSnap = await getDoc(userDocRef)
+
+			const batch = writeBatch(db)
+
+			if (userDocSnap.exists()) {
+				const userData = userDocSnap.data()
+				const updatedSets = [...(userData.flashcardSets || []), { name: setName }]
+				batch.update(userDocRef, { flashcardSets: updatedSets })
+			} else {
+				batch.set(userDocRef, { flashcardSets: [{ name: setName }] })
+			}
+
+			const setDocRef = doc(collection(userDocRef, 'flashcardSets'), setName)
+			batch.set(setDocRef, { flashcards })
+
+			await batch.commit()
+
+			alert('Flashcards saved successfully!')
+			handleCloseDialog()
+			setSetName('')
+		} catch (error) {
+			console.error('Error saving flashcards:', error)
+			alert('An error occurred while saving flashcards. Please try again.')
+		}
+	}
+
+	return (
+		<Container maxWidth="md">
+			<Box sx={{ my: 4 }}>
+				<Typography variant="h4" component="h1" gutterBottom>
+					Generate Flashcards
+				</Typography>
+				<TextField
+					value={text}
+					onChange={(e) => setText(e.target.value)}
+					label="Enter text"
+					fullWidth
+					multiline
+					rows={4}
+					variant="outlined"
+					sx={{ mb: 2 }}
+				/>
+				<Button
+					variant="contained"
+					color="primary"
+					onClick={handleSubmit}
+					fullWidth
+				>
+					Generate Flashcards
+				</Button>
+			</Box>
+
+			{flashcards.length > 0 && (
+				<Container maxWidth="md">
+					<Grid container spacing={3} sx={{ mt: 4 }}>
+						{flashcards.map((flashcard, index) => (
+							<Grid item xs={12} sm={6} md={4} key={index}>
+								<Card>
+									<CardActionArea onClick={() => handleCardClick(flashcard.name)}>
+										<CardContent>
+											<Typography variant="h5" component="div">
+												{flashcard.name}
+											</Typography>
+										</CardContent>
+									</CardActionArea>
+								</Card>
+							</Grid>
+						))}
+					</Grid>
+				</Container>
+			)}
+
+			<Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+				<Button variant="contained" color="primary" onClick={handleOpenDialog}>
+					Save Flashcards
+				</Button>
+			</Box>
+
+			<Dialog open={dialogOpen} onClose={handleCloseDialog}>
+				<DialogTitle>Save Flashcard Set</DialogTitle>
+				<DialogContent>
+					<DialogContentText>
+						Please enter a name for your flashcard set.
+					</DialogContentText>
+					<TextField
+						autoFocus
+						margin="dense"
+						label="Set Name"
+						type="text"
+						fullWidth
+						value={setName}
+						onChange={(e) => setSetName(e.target.value)}
+					/>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={handleCloseDialog}>Cancel</Button>
+					<Button onClick={saveFlashcards} color="primary">
+						Save
+					</Button>
+				</DialogActions>
+			</Dialog>
+		</Container>
+	)
 }
