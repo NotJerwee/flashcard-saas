@@ -16,8 +16,10 @@ const handleOpenDialog = () => setDialogOpen(true)
 const handleCloseDialog = () => setDialogOpen(false)
 
 export default function Generate() {
+    const { isLoaded, isSignedIn, user } = useUser()
     const [text, setText] = useState('')
     const [flashcards, setFlashcards] = useState([])
+    const router = useRouter()
 
     const handleSubmit = async () => {
         if (!text.trim()) {
