@@ -37,19 +37,19 @@ export default function Generate() {
 	const handleCloseDialog = () => setDialogOpen(false)
 
 	useEffect(() => {
-		async function getFlashcards() {
-			if (!user) return
-			const docRef = doc(collection(db, 'users'), user.id)
-			const docSnap = await getDoc(docRef)
-			if (docSnap.exists()) {
-				const collections = docSnap.data().flashcards || []
-				setFlashcards(collections)
-			} else {
-				await setDoc(docRef, { flashcards: [] })
-			}
+		async function getFlashcard() {
+		 	if (!search || !user) return
+		
+			const colRef = collection(doc(collection(db, 'users'), user.id), search)
+			const docs = await getDocs(colRef)
+			const flashcards = []
+			docs.forEach((doc) => {
+				flashcards.push({ id: doc.id, ...doc.data() })
+			})
+			getFlashcards(flashcards)
 		}
-		getFlashcards()
-	}, [user])
+		getFlashcard()
+	}, [search, user])
 
 	const handleCardClick = (id) => {
 		router.push(`/flashcard?id=${id}`)
