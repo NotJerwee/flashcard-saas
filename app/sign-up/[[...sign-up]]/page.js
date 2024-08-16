@@ -15,9 +15,9 @@ export default function SignUpPage() {
 				Flashcard SaaS
 			</Typography>
 			<Button color="inherit">
-				<Link href="/signup" passHref>
+				<Link href="/sign-in" passHref>
 				<Typography component="span" sx={{ color: 'inherit', textDecoration: 'none' }}>
-					Sign Up
+					Sign In
 				</Typography>
 				</Link>
 			</Button>
