@@ -30,6 +30,9 @@ export default function Generate() {
 	const [dialogOpen, setDialogOpen] = useState(false)
 	const router = useRouter()
 
+	const searchParams = useSearchParams()
+	const search = searchParams.get('id')
+
 	const handleOpenDialog = () => setDialogOpen(true)
 	const handleCloseDialog = () => setDialogOpen(false)
 
