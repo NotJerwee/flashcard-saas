@@ -9,6 +9,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { SignedOut, SignedIn, UserButton } from '@clerk/nextjs';
 import getStripe from './utils/get-stripe';
+import { ClerkProvider } from '@clerk/nextjs';
 
 const FlashcardSaaS = () => {
 
@@ -34,6 +35,7 @@ const FlashcardSaaS = () => {
   };
 
   return (
+	<ClerkProvider>
 	<div>
 	  <AppBar position="static">
 		<Toolbar>
@@ -84,7 +86,9 @@ const FlashcardSaaS = () => {
 		Purchase Now
 	  </Button>
 	</div>
+	</ClerkProvider>
   );
+  
 };
 
 export default FlashcardSaaS;
