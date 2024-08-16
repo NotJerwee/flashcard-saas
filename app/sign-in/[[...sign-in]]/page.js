@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react';
 import { Container, Box, Typography, AppBar, Toolbar, Button } from '@mui/material';
 import { SignIn } from '@clerk/nextjs';
