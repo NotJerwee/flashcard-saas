@@ -18,6 +18,7 @@ const handleCloseDialog = () => setDialogOpen(false)
 export default function Generate() {
     const [text, setText] = useState('')
     const [flashcards, setFlashcards] = useState([])
+
     const handleSubmit = async () => {
         if (!text.trim()) {
           alert('Please enter some text to generate flashcards.')
@@ -41,6 +42,40 @@ export default function Generate() {
           alert('An error occurred while generating flashcards. Please try again.')
         }
     }
+
+    const saveFlashcards = async () => {
+        if (!setName.trim()) {
+            alert('Please enter a name for your flashcard set.')
+            return
+        }
+      
+        try {
+            const userDocRef = doc(collection(db, 'users'), user.id)
+            const userDocSnap = await getDoc(userDocRef)
+        
+            const batch = writeBatch(db)
+        
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data()
+                const updatedSets = [...(userData.flashcardSets || []), { name: setName }]
+                batch.update(userDocRef, { flashcardSets: updatedSets })
+            } else {
+                batch.set(userDocRef, { flashcardSets: [{ name: setName }] })
+            }
+        
+            const setDocRef = doc(collection(userDocRef, 'flashcardSets'), setName)
+            batch.set(setDocRef, { flashcards })
+        
+            await batch.commit()
+        
+            alert('Flashcards saved successfully!')
+            handleCloseDialog()
+            setSetName('')
+        } catch (error) {
+            console.error('Error saving flashcards:', error)
+            alert('An error occurred while saving flashcards. Please try again.')
+        }
+      }
 
 
     return (
