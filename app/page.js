@@ -67,7 +67,7 @@ const FlashcardSaaS = () => {
 		</Button>
 	  </Box>
 
-	  <Box sx={{ my: 6 }}>
+	  <Box sx={{ my: 6, textAlign: 'center' }}>
 		<Typography variant="h4" component="h2" gutterBottom>Features</Typography>
 		<Grid container spacing={4}>
 		  {/* Feature items */}
