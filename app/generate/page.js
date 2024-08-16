@@ -92,7 +92,7 @@ export default function Generate() {
             console.error('Error saving flashcards:', error)
             alert('An error occurred while saving flashcards. Please try again.')
         }
-      }
+    }
 
 
     return (
