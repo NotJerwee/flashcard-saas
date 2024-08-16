@@ -9,6 +9,9 @@ import {
   Box,
 } from '@mui/material'
 
+const [setName, setSetName] = useState('')
+const [dialogOpen, setDialogOpen] = useState(false)
+
 const handleOpenDialog = () => setDialogOpen(true)
 const handleCloseDialog = () => setDialogOpen(false)
 
