@@ -3,6 +3,7 @@
 import React from 'react';
 import { Container, Box, Typography, AppBar, Toolbar, Button } from '@mui/material';
 import Link from 'next/link';
+import { SignedOut, SignIn } from '@clerk/nextjs';
 
 export default function SignOutPage() {
   return (
