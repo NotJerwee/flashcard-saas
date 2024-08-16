@@ -40,7 +40,8 @@ export default function Generate() {
           console.error('Error generating flashcards:', error)
           alert('An error occurred while generating flashcards. Please try again.')
         }
-      }
+    }
+
 
     return (
         <Container maxWidth="md">
