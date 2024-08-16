@@ -36,6 +36,10 @@ export default function Generate() {
     const [flashcards, setFlashcards] = useState([])
     const router = useRouter()
 
+    const handleCardClick = (id) => {
+        router.push(`/flashcard?id=${id}`)
+    }
+
     const handleSubmit = async () => {
         if (!text.trim()) {
           alert('Please enter some text to generate flashcards.')
