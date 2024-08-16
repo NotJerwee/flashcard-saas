@@ -9,6 +9,9 @@ import {
   Box,
 } from '@mui/material'
 
+const handleOpenDialog = () => setDialogOpen(true)
+const handleCloseDialog = () => setDialogOpen(false)
+
 export default function Generate() {
     const [text, setText] = useState('')
     const [flashcards, setFlashcards] = useState([])
