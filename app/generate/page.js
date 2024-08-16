@@ -52,7 +52,10 @@ export default function Generate() {
 	}, [search, user])
 
 	const handleCardClick = (id) => {
-		router.push(`/flashcard?id=${id}`)
+		setFlipped((prev) => ({
+			...prev,
+			[id]: !prev[id],
+		}))
 	}
 
 	const handleSubmit = async () => {
