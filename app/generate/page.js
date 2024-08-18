@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
-import { useUser } from 'your-auth-library'
+import { useSearchParams } from 'next/navigation';
+import { useUser } from '@clerk/nextjs'
 import {
 	Container,
 	TextField,
@@ -19,7 +19,7 @@ import {
 	DialogContentText,
 	DialogActions
 } from '@mui/material'
-import { db } from 'your-firebase-config'
+import { db } from '@/firebase'
 import { doc, getDoc, setDoc, writeBatch, collection } from 'firebase/firestore'
 
 export default function Generate() {
@@ -28,7 +28,6 @@ export default function Generate() {
 	const [flashcards, setFlashcards] = useState([])
 	const [setName, setSetName] = useState('')
 	const [dialogOpen, setDialogOpen] = useState(false)
-	const router = useRouter()
 
 	const searchParams = useSearchParams()
 	const search = searchParams.get('id')
