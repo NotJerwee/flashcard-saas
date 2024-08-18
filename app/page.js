@@ -36,7 +36,6 @@ const FlashcardSaaS = () => {
 	};
 
   	return (
-		<ClerkProvider>
 		<div>
 		<AppBar position="static">
 			<Toolbar>
@@ -125,7 +124,6 @@ const FlashcardSaaS = () => {
 		</Box>
 
 	</div>
-	</ClerkProvider>
   );
   
 };
