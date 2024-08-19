@@ -1,8 +1,11 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Container, Grid, Card, CardActionArea, CardContent, Typography, Box } from '@mui/material';
 import { useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/router';
-import { db } from '../firebase'; 
+import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { db } from '@/firebase'; 
 import { doc, collection, getDoc, setDoc } from 'firebase/firestore';
 
 export default function Flashcard() {
