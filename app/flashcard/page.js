@@ -5,7 +5,7 @@ import { Container, Box, Typography, Paper, TextField, Button, Grid, Card, CardA
 import { useUser } from '@clerk/nextjs';
 import { useSearchParams } from 'next/navigation';
 import { db } from '@/firebase'; 
-import { doc, collection, getDoc, setDoc } from 'firebase/firestore';
+import { doc, collection, getDocs, setDoc } from 'firebase/firestore';
 
 export default function Flashcard() {
 		const { isLoaded, isSignedIn, user } = useUser()
@@ -20,7 +20,7 @@ export default function Flashcard() {
 					if (!search || !user) return
 			
 					const colRef = collection(doc(collection(db, 'users'), user.id), search)
-					const docs = await getDoc(colRef)
+					const docs = await getDocs(colRef)
 					const flashcards = []
 					docs.forEach((doc) => {
 						flashcards.push({ id: doc.id, ...doc.data() })
