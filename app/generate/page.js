@@ -19,10 +19,7 @@ export default function Generate() {
     const handleSubmit = async () => {
         fetch('/api/generate', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ text }), 
+            body: text,
         })
         .then((res) => res.json())
         .then((data) => setFlashcards(data))
@@ -47,68 +44,55 @@ export default function Generate() {
     };
 
     const saveFlashcards = async () => {
-    if (!name.trim()) {
-        alert("Please enter a name for your flashcard set.");
-        return;
-    }
-
-    setIsSaving(true);
-    try {
-        const userDocRef = doc(collection(db, "users"), user.id);
-        const userDocSnap = await getDoc(userDocRef);
-
-        const batch = writeBatch(db);
-
-        if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
-            const updatedSets = [
-                ...(userData.flashcardSets || []),
-                { name, flashcards }
-            ];
-            batch.update(userDocRef, { flashcardSets: updatedSets });
-        } else {
-            batch.set(userDocRef, { flashcardSets: [{ name, flashcards }] });
+        if (!name) {
+            alert("Please enter a name for your flashcard set.");
+            return;
         }
 
-        const setDocRef = doc(collection(userDocRef, "flashcardSets"), name);
+        const batch = writeBatch(db)
+        const userDocRef = doc(collection(db, 'users'), user.id);
+        const docSnap = await getDoc(userDocRef)
+
+        if (docSnap.exists()) {
+            const collections = docSnap.data().flashcard || []
+            if (collections.find((f) => f.name === name)) {
+                alert("Flashcard collection name already exist.")
+                return
+            } else {
+            collections.push({name})
+            batch.set(userDocRef, {flashcards: collections}, {merge: true})
+            }   
+        } else {
+            batch.set(userDocRef, {flashcards: [{name}]})
+        }
+        const colRef = collection(userDocRef, name)
         flashcards.forEach((flashcard) => {
-            const cardDocRef = doc(setDocRef);
-            batch.set(cardDocRef, flashcard);
-        });
-
-        await batch.commit();
-
-        alert("Flashcards saved successfully!");
-        handleClose();
-        setName("");
-        router.push('/flashcards');
-    } catch (error) {
-        console.error("Error saving flashcards:", error);
-        alert("An error occurred while saving flashcards. Please try again.");
-    } finally {
-        setIsSaving(false);
+            const cardDocRef = doc(colRef)
+            batch.set(cardDocRef, flashcard)
+        })
+        await batch.commit()
+        handleClose()
+        router.push('/flashcards')
     }
-};
 
-if(!isLoaded){
-    return <div>Generating . . . </div>
-}
+    if(!isLoaded){
+        return <div>Generating . . . </div>
+    }
 
-if (!isSignedIn) {
-    return (
-      <div className="container mx-auto px-6">
-        <div className="mt-10 mb-14 flex flex-col items-center">
-          <h1 className="text-4xl font-semibold mb-8">Hold Up!</h1>
-          <div className="w-full bg-gray-100 shadow-lg rounded-xl p-8 flex flex-col items-center">
-            <p className="text-blue-600">
-              Please log in or create an account to access the flashcard generator.
-            </p>
-          </div>
+    if (!isSignedIn) {
+        return (
+        <div className="container mx-auto px-6">
+            <div className="mt-10 mb-14 flex flex-col items-center">
+            <h1 className="text-4xl font-semibold mb-8">Hold Up!</h1>
+            <div className="w-full bg-gray-100 shadow-lg rounded-xl p-8 flex flex-col items-center">
+                <p className="text-blue-600">
+                Please log in or create an account to access the flashcard generator.
+                </p>
+            </div>
+            </div>
         </div>
-      </div>
-    );
-}
-
+        );
+    }
 
     return (
         <Container maxWidth="md">
